@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTask | To-Do App</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>ProTask</h1>
+            <div class="search-container">
+                <input type="text" id="searchTodo" placeholder="Search tasks..." onkeyup="filterTasks()">
+            </div>
+        </header>
+
+        <div class="input-section">
+            <form id="todo-form">
+                <input type="text" id="todo-input" placeholder="Add a new task..." autocomplete="off">
+                <button type="submit" id="add-btn">Add</button>
+            </form>
+        </div>
+
+        <div class="filter-controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <button id="clear-completed">Clear Completed</button>
+        </div>
+
+        <ul id="todo-list">
+            <!-- ToDos will be injected here by JS -->
+        </ul>
+
+        <div class="footer">
+            <span id="todo-count">You have 0 tasks left</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

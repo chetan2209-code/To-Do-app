@@ -11,3 +11,6 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 *  Save todos using Local Storage
 *  Todos remain available after refreshing the page
 *  Simple and responsive user interface
+
+## LIVE LINK:
+ https://chetan2209-code.github.io/To-Do-app/

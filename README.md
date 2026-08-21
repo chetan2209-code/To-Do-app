@@ -12,7 +12,7 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 *  Todos remain available after refreshing the page
 *  Simple and responsive user interface
 
-🛠️ Technologies Used
+## Technologies Used
 HTML5
 CSS3
 JavaScript

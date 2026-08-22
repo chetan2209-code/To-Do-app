@@ -15,9 +15,9 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 ## Technologies Used
 * HTML5
 * CSS3
-JavaScript
-DOM Manipulation
-Local Storage
+* JavaScript
+   - DOM Manipulation
+   - Local Storage
 
 ## LIVE LINK:
  https://chetan2209-code.github.io/To-Do-app/

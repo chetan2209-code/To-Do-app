@@ -13,8 +13,8 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 *  Simple and responsive user interface
 
 ## Technologies Used
-HTML5
-CSS3
+* HTML5
+* CSS3
 JavaScript
 DOM Manipulation
 Local Storage

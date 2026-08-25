@@ -22,7 +22,7 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 ## Future Improvements
 * Add task editing functionality
 * Add filters for completed/pending tasks
-Add task due dates
+* Add task due dates
 Add dark mode
 Add categories and priorities
 Improve UI/UX

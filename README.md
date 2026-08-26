@@ -1,4 +1,4 @@
-# **Todo App** #
+# **Todo App** 
 
 A simple and interactive Todo App built to practice JavaScript fundamentals, DOM manipulation, event handling, and local data management.
 
@@ -25,7 +25,7 @@ A simple and interactive Todo App built to practice JavaScript fundamentals, DOM
 * Add task due dates
 * Add dark mode
 * Add categories and priorities
-Improve UI/UX
+* Improve UI/UX
 
 ## LIVE LINK:
  https://chetan2209-code.github.io/To-Do-app/

@@ -9,12 +9,10 @@ const searchInput = document.getElementById('searchTodo');
 let todos = JSON.parse(localStorage.getItem('todos')) || [];
 let currentFilter = 'all';
 
-// Initialize App
-window.onload = () => {
-    renderTodos();
-};
+// 1. Initial Load
+window.addEventListener('DOMContentLoaded', renderTodos);
 
-// 1. Add Todo
+// 2. Add Task
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const text = todoInput.value.trim();
@@ -29,55 +27,85 @@ todoForm.addEventListener('submit', (e) => {
     }
 });
 
-// 2. Render ToDos based on Filter and Search
+// 3. Render Engine (XSS Safe & Event Delegated)
 function renderTodos() {
-    let filteredTodos = todos.filter(todo => {
+    const query = searchInput.value.toLowerCase().trim();
+    
+    const filteredTodos = todos.filter(todo => {
         const matchesFilter = 
             currentFilter === 'all' ? true : 
             currentFilter === 'completed' ? todo.completed : !todo.completed;
         
-        const matchesSearch = todo.text.toLowerCase().includes(searchInput.value.toLowerCase());
-        
+        const matchesSearch = todo.text.toLowerCase().includes(query);
         return matchesFilter && matchesSearch;
     });
 
     todoList.innerHTML = '';
+
+    if (filteredTodos.length === 0) {
+        todoList.innerHTML = `<li style="text-align:center; padding: 1rem; color: var(--text-muted);">No tasks found</li>`;
+        updateCounter();
+        return;
+    }
 
     filteredTodos.forEach(todo => {
         const li = document.createElement('li');
         li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
         li.dataset.id = todo.id;
 
-        li.innerHTML = `
-            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleComplete(${todo.id})">
-            <span class="todo-text">${todo.text}</span>
-            <div class="btn-group">
-                <button class="edit-btn" onclick="editTodo(${todo.id})">Edit</button>
-                <button class="delete-btn" onclick="deleteTodo(${todo.id})">Delete</button>
-            </div>
+        // Checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = todo.completed;
+        checkbox.className = 'toggle-btn';
+
+        // Task Text (Prevents XSS Injection)
+        const span = document.createElement('span');
+        span.className = 'todo-text';
+        span.textContent = todo.text;
+
+        // Action Buttons Container
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+        btnGroup.innerHTML = `
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
         `;
+
+        li.append(checkbox, span, btnGroup);
         todoList.appendChild(li);
     });
 
     updateCounter();
 }
 
-// 3. Toggle Complete
-function toggleComplete(id) {
-    todos = todos.map(todo => todo.id === id ? { ...todo, completed: !todo.completed } : todo);
-    saveAndRender();
-}
+// 4. Centralized Event Delegation (Click Handlers)
+todoList.addEventListener('click', (e) => {
+    const li = e.target.closest('.todo-item');
+    if (!li) return;
+    
+    const id = Number(li.dataset.id);
 
-// 4. Delete Todo
-function deleteTodo(id) {
-    todos = todos.filter(todo => todo.id !== id);
-    saveAndRender();
-}
+    if (e.target.classList.contains('delete-btn')) {
+        todos = todos.filter(t => t.id !== id);
+        saveAndRender();
+    } 
+    else if (e.target.classList.contains('edit-btn')) {
+        handleEdit(li, id);
+    }
+});
 
-// 5. Edit Todo
-function editTodo(id) {
-    const item = todos.find(todo => todo.id === id);
-    const li = document.querySelector(`[data-id="${id}"]`);
+todoList.addEventListener('change', (e) => {
+    if (e.target.classList.contains('toggle-btn')) {
+        const id = Number(e.target.closest('.todo-item').dataset.id);
+        todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+        saveAndRender();
+    }
+});
+
+// 5. Safe Edit Handler
+function handleEdit(li, id) {
+    const item = todos.find(t => t.id === id);
     const textSpan = li.querySelector('.todo-text');
     
     const input = document.createElement('input');
@@ -85,20 +113,26 @@ function editTodo(id) {
     input.className = 'edit-input';
     input.value = item.text;
 
-    input.onblur = () => {
-        item.text = input.value.trim() || item.text;
+    const saveChanges = () => {
+        const updatedText = input.value.trim();
+        if (updatedText) {
+            item.text = updatedText;
+        }
         saveAndRender();
     };
 
-    input.onkeydown = (e) => {
+    input.addEventListener('blur', saveChanges);
+    input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') input.blur();
-    };
+    });
 
     textSpan.replaceWith(input);
     input.focus();
 }
 
-// 6. Filter Functionality
+// 6. Search & Filter Handlers
+searchInput.addEventListener('input', renderTodos);
+
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('active'));
@@ -108,24 +142,16 @@ filterBtns.forEach(btn => {
     });
 });
 
-// 7. Search Functionality
-function filterTasks() {
-    renderTodos();
-}
-
-// 8. Clear Completed
 clearBtn.addEventListener('click', () => {
     todos = todos.filter(todo => !todo.completed);
     saveAndRender();
 });
 
-// Utility: Update Counter
 function updateCounter() {
-    const activeTasks = todos.filter(t => !t.completed).length;
-    todoCount.innerText = `You have ${activeTasks} task${activeTasks !== 1 ? 's' : ''} left`;
+    const activeCount = todos.filter(t => !t.completed).length;
+    todoCount.textContent = `You have ${activeCount} task${activeCount !== 1 ? 's' : ''} left`;
 }
 
-// Utility: LocalStorage & Render
 function saveAndRender() {
     localStorage.setItem('todos', JSON.stringify(todos));
     renderTodos();

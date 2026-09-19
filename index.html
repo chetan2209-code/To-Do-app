@@ -3,44 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ProTask is a simple to-do app with priorities, due dates, search, filters and dark mode. Your tasks stay in your browser.">
+    <meta name="theme-color" content="#dde6f2" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0a1024" media="(prefers-color-scheme: dark)">
     <title>ProTask | To-Do App</title>
+
+    <!-- Favicon (inline SVG, no extra file needed) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232440f0'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='%23ffd84d' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+    <!-- Apply the saved theme before the page paints, so there is no light/dark flash -->
+    <script>
+        try {
+            var savedTheme = localStorage.getItem('theme');
+            if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                savedTheme = 'dark';
+            }
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        } catch (err) { /* storage blocked: fall back to the default theme */ }
+    </script>
+
+    <!-- Fonts: Bricolage Grotesque (headings) + Figtree (text) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="app-container">
+    <main class="app-container">
+        <noscript>
+            <p class="noscript">ProTask needs JavaScript to work. Please turn it on in your browser settings.</p>
+        </noscript>
+
         <header>
             <h1>ProTask</h1>
-            <div class="search-container">
-                <input type="text" id="searchTodo" placeholder="Search tasks..." onkeyup="filterTasks()">
+            <div class="header-tools">
+                <div class="search-container">
+                    <input type="search" id="searchTodo" placeholder="Search tasks..." aria-label="Search tasks" autocomplete="off">
+                </div>
+                <button type="button" id="theme-toggle" class="theme-btn">Dark</button>
             </div>
         </header>
 
-        <div class="input-section">
+        <section class="progress" aria-label="Progress">
+            <div class="progress-text">
+                <span id="progress-label">No tasks yet</span>
+                <span id="progress-pct" class="progress-pct">0%</span>
+            </div>
+            <div id="progress-bar" class="progress-track" role="progressbar" aria-label="Tasks completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </section>
+
+        <section class="input-section" aria-label="Add a task">
             <form id="todo-form">
-                <input type="text" id="todo-input" placeholder="Add a new task..." autocomplete="off">
-                <button type="submit" id="add-btn">Add</button>
+                <input type="text" id="todo-input" placeholder="Add a new task..." autocomplete="off" maxlength="200" enterkeyhint="done" aria-label="New task">
+                <div class="form-options">
+                    <select id="priority-input" aria-label="Priority">
+                        <option value="low">Low priority</option>
+                        <option value="medium" selected>Medium priority</option>
+                        <option value="high">High priority</option>
+                    </select>
+                    <input type="date" id="due-input" aria-label="Due date">
+                    <button type="submit" id="add-btn">Add task</button>
+                </div>
             </form>
-        </div>
+        </section>
 
         <div class="filter-controls">
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
+            <div class="filter-buttons" role="group" aria-label="Filter tasks">
+                <button class="filter-btn active" data-filter="all" aria-pressed="true">All <span class="filter-count">0</span></button>
+                <button class="filter-btn" data-filter="active" aria-pressed="false">Active <span class="filter-count">0</span></button>
+                <button class="filter-btn" data-filter="completed" aria-pressed="false">Completed <span class="filter-count">0</span></button>
             </div>
             <button id="clear-completed">Clear Completed</button>
         </div>
 
-        <ul id="todo-list">
+        <div class="sort-row">
+            <label for="sort-select">Sort by</label>
+            <select id="sort-select">
+                <option value="added">Date added</option>
+                <option value="priority">Priority</option>
+                <option value="due">Due date</option>
+            </select>
+        </div>
+
+        <ul id="todo-list" aria-label="Task list">
             <!-- ToDos will be injected here by JS -->
         </ul>
 
-        <div class="footer">
+        <footer class="footer">
             <span id="todo-count">You have 0 tasks left</span>
-        </div>
+        </footer>
+    </main>
+
+    <!-- Undo toast for delete / clear completed -->
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+        <span id="toast-msg"></span>
+        <button type="button" id="toast-undo">Undo</button>
     </div>
 
     <script src="script.js"></script>
